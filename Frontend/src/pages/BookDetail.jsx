@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../helper/axiosInstance.js";
 import StarRating from "../components/StarRating";
@@ -10,40 +10,48 @@ const BookDetail = () => {
   const [book, setBook] = useState(null);
 
   const fetchBook = async () => {
-    const res = await API.get(`/book/book/${id}`);
-
-    setBook(res.data.data);
+    try {
+      const res = await API.get(`/book/book/${id}`);
+      setBook(res.data.data);
+    } catch {
+      setBook(null);
+    }
   };
-
-  
 
   useEffect(() => {
     fetchBook();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (!book)
     return (
-      <div className="text-center py-16 text-blue-700">Loading book...</div>
+      <div className="flex justify-center items-center py-20 text-blue-400 text-lg font-semibold">
+        Loading book...
+      </div>
     );
 
   return (
-    <div className="max-w-2xl mx-auto mt-8 bg-white p-8 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-2">{book.title}</h2>
-      <div className="flex items-center text-gray-700 mb-2 gap-2">
+    <div className="max-w-3xl mx-auto mt-10 bg-[#1a2233] border border-[#23213a] rounded-3xl p-8 shadow-lg text-gray-300">
+      <h2 className="text-3xl font-bold mb-4 text-white truncate">{book.title}</h2>
+
+      <div className="flex flex-wrap items-center gap-3 mb-4 text-blue-300 text-sm">
         <span>
-          by <span className="font-semibold">{book.author}</span>
+          by <span className="font-semibold text-blue-200">{book.author}</span>
         </span>
-        <span className="text-xs px-2 py-1 bg-blue-100 text-blue-500 rounded">
+        <span className="px-3 py-1 text-xs uppercase font-semibold bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 rounded-full tracking-wider select-none">
           {book.genre}
         </span>
       </div>
-      <div className="flex items-center gap-2 mb-4">
-        <StarRating rating={Number(book.averageRating) || 0} />
-        <span className="text-gray-700">
+
+      <div className="flex items-center gap-3 mb-6">
+        <StarRating rating={Number(book.averageRating) || 0} dark />
+        <span className="text-blue-300 text-lg font-medium select-none">
           {book.averageRating ? `${book.averageRating}/5` : "No ratings yet"}
         </span>
       </div>
+
       <ReviewForm bookId={id} onNewReview={fetchBook} />
+
       <ReviewList reviews={book.reviews || []} />
     </div>
   );

@@ -11,14 +11,9 @@ const ReviewForm = ({ bookId, onNewReview }) => {
     const fetchLoggedInUser = async () => {
       try {
         await API.get("/auth/get-user");
-
-        console.log("User is logged in.");
-        
         setIsUserLoggedIn(true);
       } catch (error) {
-        // user not logged in
         if (error.response && error.response.status === 401) {
-          console.log("User not logged in or session expired.");
           setIsUserLoggedIn(false);
         }
       }
@@ -31,7 +26,6 @@ const ReviewForm = ({ bookId, onNewReview }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!isUserLoggedIn) {
       setMessage("You must be logged in to add a review.");
       return;
@@ -53,26 +47,40 @@ const ReviewForm = ({ bookId, onNewReview }) => {
   const rating = Number(form.rating);
 
   return (
-    <form className="my-6" onSubmit={handleSubmit}>
-      <label className="block mb-2 font-semibold text-gray-800">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-[#1a2233] border border-[#23213a] rounded-3xl p-6 max-w-3xl mx-auto text-gray-300 shadow-lg transition-transform "
+    >
+      <label
+        htmlFor="review_text"
+        className="block mb-3 text-lg font-semibold text-white"
+      >
         Leave a Review
       </label>
       <textarea
+        id="review_text"
         name="review_text"
-        placeholder="Your review..."
+        placeholder="Write your review..."
         value={form.review_text}
         onChange={handleChange}
-        className="w-full border rounded px-3 py-2 mb-2"
-        rows={3}
+        rows={4}
         required
+        className="w-full resize-none rounded-xl border border-[#393f63] bg-[#232842] px-4 py-3 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
       />
-      <div className="flex items-center gap-2 mb-2">
-        <span className="font-bold text-gray-700">Rating:</span>
+
+      <div className="flex items-center gap-4 mt-4">
+        <label
+          htmlFor="rating"
+          className="font-semibold text-gray-300 select-none"
+        >
+          Rating:
+        </label>
         <select
+          id="rating"
           name="rating"
           value={form.rating}
           onChange={handleChange}
-          className="rounded border px-2 py-1"
+          className="rounded-lg bg-[#232842] border border-[#393f63] px-3 py-1 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         >
           {[5, 4, 3, 2, 1].map((v) => (
             <option key={v} value={v}>
@@ -80,22 +88,25 @@ const ReviewForm = ({ bookId, onNewReview }) => {
             </option>
           ))}
         </select>
-        <StarRating rating={rating} />
+        <StarRating rating={rating} dark />
       </div>
+
       <button
-        className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold"
         type="submit"
+        className="mt-6 w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 text-white font-semibold py-3 rounded-full shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
       >
         Add Review
       </button>
+
       {message && (
-        <div
-          className={`mt-2 ${
-            message === "Review added!" ? "text-green-600" : "text-red-600"
+        <p
+          className={`mt-4 text-center font-medium ${
+            message === "Review added!" ? "text-green-400" : "text-red-500"
           }`}
+          role="alert"
         >
           {message}
-        </div>
+        </p>
       )}
     </form>
   );

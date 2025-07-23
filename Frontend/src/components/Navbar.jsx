@@ -1,25 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Api from "../helper/axiosInstance.js";
-import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
-
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(null);
 
   useEffect(() => {
     const fetchLoggedInUser = async () => {
       try {
         await Api.get("/auth/get-user");
-
-        console.log("User is logged in.");
-
         setIsUserLoggedIn(true);
       } catch (error) {
-        // user not logged in
         if (error.response && error.response.status === 401) {
-          console.log("User not logged in or session expired.");
           setIsUserLoggedIn(false);
         }
       }
@@ -30,57 +23,78 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await Api.post("/auth/logout");
-      setIsUserLoggedIn(true);
+      setIsUserLoggedIn(false); // Fix: set logged out on success
       navigate("/login");
     } catch (error) {
-      setIsUserLoggedIn(false);
       console.error("Error logging out:", error);
+      setIsUserLoggedIn(false);
     }
   };
 
   return (
-    <nav className="bg-white shadow mb-8 sticky top-0 z-10">
-      <div className="container mx-auto flex justify-between items-center p-4">
-        <div className="flex items-center gap-2">
-          <span
-            onClick={() => navigate("/")}
-            className="text-2xl font-bold text-blue-600 cursor-pointer"
-          >
-            BookReviews
-          </span>
+    <nav className="bg-[#1a2233] shadow-md sticky top-0 z-50">
+      <div className="container mx-auto flex justify-between items-center p-2 mb-3">
+        <div
+          onClick={() => navigate("/")}
+          className="text-3xl font-extrabold text-blue-500 cursor-pointer select-none hover:text-blue-400 transition"
+          tabIndex={0}
+          role="button"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") navigate("/");
+          }}
+          aria-label="Navigate to Home"
+        >
+          Book Review Platform
         </div>
-        <ul className="flex gap-4 items-center">
+
+        <ul className="flex gap-6 items-center text-gray-300 select-none">
           <li>
-            <Link className="hover:text-blue-700" to="/">
+            <Link
+              to="/"
+              className="hover:text-blue-400 focus:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 px-2 py-1 rounded transition"
+            >
               Books
             </Link>
           </li>
+
           {isUserLoggedIn && (
             <li>
-              <Link className="hover:text-blue-700" to="/add">
+              <Link
+                to="/add"
+                className="hover:text-blue-400 focus:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 px-2 py-1 rounded transition"
+              >
                 Add Book
               </Link>
             </li>
           )}
+
           {!isUserLoggedIn && (
-            <li>
-              <Link className="hover:text-blue-700" to="/login">
-                Login
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link
+                  to="/login"
+                  className="hover:text-blue-400 focus:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 px-2 py-1 rounded transition"
+                >
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/signup"
+                  className="hover:text-blue-400 focus:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 px-2 py-1 rounded transition"
+                >
+                  Signup
+                </Link>
+              </li>
+            </>
           )}
-          {!isUserLoggedIn && (
-            <li>
-              <Link className="hover:text-blue-700" to="/signup">
-                Signup
-              </Link>
-            </li>
-          )}
+
           {isUserLoggedIn && (
             <li>
               <button
-                className="bg-blue-600 text-white rounded px-3 py-1"
                 onClick={handleLogout}
+                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-lg px-4 py-1 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                aria-label="Log out"
               >
                 Logout
               </button>
