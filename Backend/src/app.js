@@ -1,11 +1,13 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 
 // const allowedOrigins = process.env.CORS_ORIGIN.split(",");
-const allowedOrigins = ["http://localhost:5173", process.env.CORS_ORIGIN];
+const allowedOrigins = [process.env.CORS_ORIGIN];
 
 //.use to configure middelware.
 app.use(
@@ -25,7 +27,11 @@ import bookRouter from "./routes/books.js";
 import reviewRouter from "./routes/reviews.js";
 
 app.get("/", (req, res) => {
-  res.status(200).send("Welcome 7Webs Team. This is the backend server for the Book Review App.");
+  res
+    .status(200)
+    .send(
+      "Welcome 7Webs Team. This is the backend server for the Book Review App."
+    );
 });
 
 app.use("/auth", authRouter);
