@@ -1,6 +1,6 @@
 import express from "express";
-import Book from "../models/Book.js";
-import Review from "../models/Review.js";
+import { Book } from "../models/Book.js";
+import { Review } from "../models/Review.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -27,8 +27,14 @@ const AddBook = asyncHandler(async (req, res) => {
 const GetBooks = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, genre, author, sortBy } = req.query;
   const filter = {};
-  if (genre) filter.genre = genre;
-  if (author) filter.author = author;
+
+  if (genre) {
+    filter.genre = { $regex: genre, $options: "i" };
+  }
+
+  if (author) {
+    filter.author = { $regex: author, $options: "i" };
+  }
 
   let sortOptions = {};
   if (sortBy === "rating") sortOptions.averageRating = -1;
@@ -64,6 +70,12 @@ const GetBooks = asyncHandler(async (req, res) => {
         };
       })
     );
+
+    if (booksWithRatings.length === 0) {
+      return res
+        .status(404)
+        .json(new ApiError(404, "No books found matching the criteria"));
+    }
 
     return res
       .status(200)

@@ -1,5 +1,8 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 const userSchema = new mongoose.Schema({
   username: { type: String, unique: true, required: true },
@@ -7,18 +10,17 @@ const userSchema = new mongoose.Schema({
   refreshToken: { type: String, default: null },
 });
 
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-userSchema.methods.comparePassword = function(password) {
+userSchema.methods.isCorrectPassword = function (password) {
   return bcrypt.compare(password, this.password);
 };
 
 userSchema.methods.generateAccessToken = async function () {
-
   return jwt.sign(
     {
       _id: this._id, //auto saved by mongodb
@@ -41,5 +43,5 @@ userSchema.methods.generateRefreshToken = async function () {
   );
 };
 
-const User = mongoose.model('User', userSchema);
-export default User;
+const User = mongoose.model("User", userSchema);
+export { User };
