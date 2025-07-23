@@ -45,8 +45,7 @@ const GetBooks = asyncHandler(async (req, res) => {
   }
 
   let sortOptions = {};
-  if (sortBy === "rating") sortOptions.averageRating = -1;
-  else sortOptions.createdAt = -1;
+  if (sortBy !== "rating") sortOptions.createdAt = 1;
 
   try {
     const books = await Book.find(filter)
@@ -78,6 +77,13 @@ const GetBooks = asyncHandler(async (req, res) => {
         };
       })
     );
+
+    // Sort after computing averageRating
+    if (sortBy === "rating") {
+      booksWithRatings.sort(
+        (a, b) => (b.averageRating ?? 0) - (a.averageRating ?? 0)
+      );
+    }
 
     return res
       .status(200)
