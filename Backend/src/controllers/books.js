@@ -25,7 +25,15 @@ const AddBook = asyncHandler(async (req, res) => {
 
 // Get books (with filters, sorting, pagination), get '/'
 const GetBooks = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, genre, author, sortBy } = req.query;
+  let { page = 1, limit = 10, genre, author, sortBy } = req.query;
+
+  // Convert page and limit to numbers
+  page = Number(page);
+  limit = Number(limit);
+
+  genre = genre ? genre.trim() : null;
+  author = author ? author.trim() : null;
+
   const filter = {};
 
   if (genre) {
@@ -70,12 +78,6 @@ const GetBooks = asyncHandler(async (req, res) => {
         };
       })
     );
-
-    if (booksWithRatings.length === 0) {
-      return res
-        .status(404)
-        .json(new ApiError(404, "No books found matching the criteria"));
-    }
 
     return res
       .status(200)

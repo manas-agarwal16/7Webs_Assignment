@@ -21,6 +21,17 @@ const CreateReview = asyncHandler(async (req, res) => {
       .json(new ApiError(400, "Rating must be between 1 and 5"));
 
   try {
+    const reviewExists = await Review.findOne({
+      book: req.params.bookId,
+      reviewer: req.user._id,
+    });
+
+    if (reviewExists) {
+      return res
+        .status(400)
+        .json(new ApiError(400, "You have already reviewed this book"));
+    }
+
     const review = new Review({
       review_text,
       rating,
