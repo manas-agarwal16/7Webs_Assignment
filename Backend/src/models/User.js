@@ -24,9 +24,7 @@ userSchema.methods.generateAccessToken = async function () {
   return jwt.sign(
     {
       _id: this._id, //auto saved by mongodb
-      email: this.email,
       username: this.username,
-      fullName: this.fullName,
     },
     process.env.ACCESS_TOKEN_KEY,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }

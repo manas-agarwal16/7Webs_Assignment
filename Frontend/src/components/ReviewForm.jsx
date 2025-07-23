@@ -1,15 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import API from "../helper/axiosInstance.js";
 import StarRating from "./StarRating";
 
 const ReviewForm = ({ bookId, onNewReview }) => {
   const [form, setForm] = useState({ review_text: "", rating: 5 });
   const [message, setMessage] = useState("");
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(null);
 
-  const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+  useEffect(() => {
+    const fetchLoggedInUser = async () => {
+      try {
+        await API.get("/auth/get-user");
 
-  const handleSubmit = async e => {
+        console.log("User is logged in.");
+        
+        setIsUserLoggedIn(true);
+      } catch (error) {
+        // user not logged in
+        if (error.response && error.response.status === 401) {
+          console.log("User not logged in or session expired.");
+          setIsUserLoggedIn(false);
+        }
+      }
+    };
+    fetchLoggedInUser();
+  }, [bookId]);
+
+  const handleChange = (e) =>
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isUserLoggedIn) {
+      setMessage("You must be logged in to add a review.");
+      return;
+    }
     if (!form.review_text || !form.rating) {
       setMessage("Please provide review text and a rating.");
       return;
@@ -28,7 +54,9 @@ const ReviewForm = ({ bookId, onNewReview }) => {
 
   return (
     <form className="my-6" onSubmit={handleSubmit}>
-      <label className="block mb-2 font-semibold text-gray-800">Leave a Review</label>
+      <label className="block mb-2 font-semibold text-gray-800">
+        Leave a Review
+      </label>
       <textarea
         name="review_text"
         placeholder="Your review..."
@@ -46,16 +74,29 @@ const ReviewForm = ({ bookId, onNewReview }) => {
           onChange={handleChange}
           className="rounded border px-2 py-1"
         >
-          {[5,4,3,2,1].map(v => (
-            <option key={v} value={v}>{v}</option>
+          {[5, 4, 3, 2, 1].map((v) => (
+            <option key={v} value={v}>
+              {v}
+            </option>
           ))}
         </select>
         <StarRating rating={rating} />
       </div>
-      <button className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold" type="submit">
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold"
+        type="submit"
+      >
         Add Review
       </button>
-      {message && <div className={`mt-2 ${message === 'Review added!' ? 'text-green-600' : 'text-red-600'}`}>{message}</div>}
+      {message && (
+        <div
+          className={`mt-2 ${
+            message === "Review added!" ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {message}
+        </div>
+      )}
     </form>
   );
 };

@@ -20,8 +20,6 @@ const BookList = () => {
         params: { ...filters, page, limit: 6 },
       });
 
-      console.log("Fetched books:", res);
-      
       setBooks(res.data.data);
       setTotal(
         res.data.length < 6 ? (page - 1) * 6 + res.data.length : page * 6 + 1
