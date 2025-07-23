@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 const app = express();
 
 // const allowedOrigins = process.env.CORS_ORIGIN.split(",");
-const allowedOrigins = ["http://localhost:3000", process.env.CORS_ORIGIN];
+const allowedOrigins = ["http://localhost:5173", process.env.CORS_ORIGIN];
 
 //.use to configure middelware.
 app.use(
