@@ -18,7 +18,7 @@ const Navbar = () => {
       }
     };
     fetchLoggedInUser();
-  }, []);
+  }, [navigate]);
 
   const handleLogout = async () => {
     try {
